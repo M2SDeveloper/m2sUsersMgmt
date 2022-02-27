@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public MessageStatus<List<UserDTO>> findAll(Integer orderId) {
+	public MessageStatus<List<UserDTO>> findAll() {
 		MessageStatus msg = new MessageStatus<>();
 		log.info("Inside User List");
 		List<UserDTO> userDtoList = new ArrayList<UserDTO>();
