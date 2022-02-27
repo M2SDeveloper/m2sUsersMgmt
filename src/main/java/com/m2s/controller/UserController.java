@@ -6,7 +6,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.m2s.entities.UserDTO;
+import com.m2s.dto.UserDTO;
 import com.m2s.message.MessageStatus;
 import com.m2s.service.UserService;
 
@@ -25,6 +28,8 @@ import com.m2s.service.UserService;
 @RequestMapping(value = "/api/v1")
 public class UserController {
 
+	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
 	@Autowired
 	UserService userService;
 	
@@ -32,7 +37,10 @@ public class UserController {
 	public MessageStatus CreateUser(@Valid @RequestBody UserDTO user,
 			HttpServletRequest req, HttpServletResponse resp) {
 		MessageStatus msg = new MessageStatus();
+		logger.info("Inside controller");
 		msg = userService.createUser(user);
+		System.out.println("testing....");
+		logger.info("controller exection completed");
 		return msg;
 	}
 	
@@ -50,28 +58,15 @@ public class UserController {
 		return userService.findAll(orderBy);
 	}
 	
-	@GetMapping("users/sync")
-	public MessageStatus synchToDB(HttpServletRequest req) {
-		 userService.synchToDB();
-		 return new MessageStatus<>("Batch processing completed", 200);	
-	}
-	
 	@GetMapping(value = "users/{userId}")
 	public MessageStatus getUser(@PathVariable("userId") Integer userId,
 			HttpServletRequest req, HttpServletResponse resp) {
-		MessageStatus msg=new MessageStatus<>();
-		
-		UserDTO user= userService.getUser(userId);
-		if(user==null) {
-			 msg.setMessage("No data available for user ID : "+userId );
-		     msg.setStatusCode(406);
-		 }
-		 else {
-			 msg.setData(user);
-			 msg.setMessage("successfully get Data"); 
-			 msg.setStatusCode(200);
-		 } 
-		return msg;
+		return userService.getUser(userId);
+	}
+	
+	@DeleteMapping("delete/{id}")
+	public MessageStatus deleteUser(@PathVariable("id") Long id) {
+		return  userService.deleteUser(id);
 	}
 	
 }
